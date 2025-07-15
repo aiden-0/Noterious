@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 from pinecone import Pinecone
+from postgres import get_db
+from postcrud import get_markdown
 import uuid
 import os
 
@@ -33,22 +35,56 @@ def upsertNote(id,title, markdown):
 def updateNote(id, markdown):
     return False
 
-#here return top 2 similar notes for gpt  to provide most acccurate answer based on user prompt
+#here return top 2 similar notes for gpt  to provide most acccurate answer based on user prompt, return ID of top 2 notes
 def getSimilarNotes(prompt):
     vectorRep = getEmbed(prompt)
-    return(index.query(
+    response = index.query(
         namespace = "__default__",
         vector = vectorRep,
         top_k = 2,
         include_metadata = True,
         include_values = False
-    ))
+    )
+    return(response["matches"][0]["id"], response["matches"][1]["id"])
+
 
 #for the prompt respone, need the user prompt, the notes in context to the prompt., might change the all DB to this file so i can access all form one
 def getPromptResponse(userPrompt):
-    return "hi"
+    top2Notes = getSimilarNotes(userPrompt)
+    with get_db() as cursor:
+        markdown1 = get_markdown(cursor, top2Notes[0])
+        markdown2 = get_markdown(cursor, top2Notes[1])
+    
+    prompt = f"""
+        - Answer the users prompt based on the notes given
+        - Always cite which note by title you’re drawing information from when you reference or quote.
+        - If you can't based on given notes state that and provide a alternative answer if possible
+        - Be concise: aim for 2–4 sentence answers for simple queries, up to a paragraph for deeper explanations.
+        - Keep user privacy in mind: never expose unrelated notes or metadata.
+        Note 1: {markdown1}
+        Note 2: {markdown2}
 
-print(getSimilarNotes("What workout do I hit on friday?"))
+        User prompt: {userPrompt}
+    """
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        instructions="You are a notebot, an AI assistant",
+        input= prompt
+    )
+    return(response.output_text)
+
+
+
+
+
+
+
+
+print(getPromptResponse("Can you help me study for my 260 exam coming up, what are the topics and how should I prepare?"))
+# similar = getSimilarNotes("What workout do I hit on friday?")
+# with get_db() as cursor:
+#     result = get_markdown(cursor, similar[0])
+    
 # note1  = "Buy milk, eggs, whole-grain bread, spinach, and avocados for the week."
 # title1  = "Grocery List"
 # note2  = "Discuss potential features for the task-tracker app: dark mode, API rate limiter, offline support."
