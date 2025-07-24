@@ -1,4 +1,5 @@
 import NewNote from "./components/NewNote";
+import NoteShow from "./components/NoteShow"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Home } from "./components/Home";
@@ -11,9 +12,9 @@ export type NoteData = {
 }
 
 export default function App() {
-  // Sample notes data - replace with your actual notes state
+  
   const notes: Array<{id: string, title: string, markdown: string, createdAt: string}> = [
-    // Add your notes here or connect to your data source
+    
   ];
 
   return (
@@ -22,8 +23,8 @@ export default function App() {
         <Route path="/" element={<Layout notes={notes} />}>
           <Route index element={<Home />} />
           <Route path="new" element={<NewNote />} />
-          <Route path=":id" element={<h1>Show</h1>} />
-          <Route path=":id/edit" element={<h1>Edit</h1>} />
+          <Route path=":id" element={<NoteShow />} />
+          {/* <Route path=":id/edit" element={<h1>Edit</h1>} /> */}
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

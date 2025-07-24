@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 from pinecone import Pinecone
-from postgres import get_db
-from postcrud import get_markdown
+from .postgres import get_db
+from .postcrud import get_markdown #need "." here for fastapi server
 import uuid
 import os
 
@@ -56,13 +56,13 @@ def getPromptResponse(userPrompt):
         markdown2 = get_markdown(cursor, top2Notes[1])
     
     prompt = f"""
-        - Answer the users prompt based on the notes given
+        - Answer the users prompt based on the notes given if you can.
         - Always cite which note by title you’re drawing information from when you reference or quote.
-        - If you can't based on given notes state that and provide a alternative answer if possible
-        - Be concise: aim for 2–4 sentence answers for simple queries, up to a paragraph for deeper explanations.
+        - If you can't based on given notes state that and provide a alternative answer that doesnt have to include the notes
+        - Be concise: aim for 2-4 sentence answers for simple queries, up to a paragraph for deeper explanations.
         - Keep user privacy in mind: never expose unrelated notes or metadata.
-        Note 1: {markdown1}
-        Note 2: {markdown2}
+        Title of note 1: {markdown1[1]}: {markdown1[0]}
+        Title of note 2: {markdown2[1]}: {markdown2[0]}
 
         User prompt: {userPrompt}
     """
@@ -72,19 +72,23 @@ def getPromptResponse(userPrompt):
         input= prompt
     )
     return(response.output_text)
+    
 
 
 
 
 
 
+#testing prompt responses here:
 
-
-print(getPromptResponse("Can you help me study for my 260 exam coming up, what are the topics and how should I prepare?"))
+# print(getPromptResponse("I remember I had to do something important on June first what was it? ")) 
 # similar = getSimilarNotes("What workout do I hit on friday?")
 # with get_db() as cursor:
-#     result = get_markdown(cursor, similar[0])
-    
+#     result = get_markdown(cursor, "e481261e-7409-49b6-a912-1dbbf18c0faf")
+
+# print(result[1])
+# print(result[0])
+# print(result[0])
 # note1  = "Buy milk, eggs, whole-grain bread, spinach, and avocados for the week."
 # title1  = "Grocery List"
 # note2  = "Discuss potential features for the task-tracker app: dark mode, API rate limiter, offline support."

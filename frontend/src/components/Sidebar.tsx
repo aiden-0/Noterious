@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Home, Plus, FileText } from 'lucide-react';
-import './Sidebar.css'; // We'll create this file
+import './Sidebar.css';
 
 interface Note {
   id: string;
