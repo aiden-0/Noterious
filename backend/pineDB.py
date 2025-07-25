@@ -32,9 +32,13 @@ def upsertNote(id,title, markdown):
 )
 
 #update vector embedding of note. 
-def updateNote(id, markdown):
-    return False
-
+def updateVector(id1, title, markdown):
+    newVector = getEmbed(markdown)
+    index.update(id = id1, 
+                 values = newVector,
+                 set_metadata = {"title": title},
+                 namespace = "__default__")
+    
 #here return top 2 similar notes for gpt  to provide most acccurate answer based on user prompt, return ID of top 2 notes
 def getSimilarNotes(prompt):
     vectorRep = getEmbed(prompt)
@@ -73,8 +77,6 @@ def getPromptResponse(userPrompt):
     )
     return(response.output_text)
     
-
-
 
 
 

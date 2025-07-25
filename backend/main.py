@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .postgres import get_db
-from .postcrud import create_note
-from .pineDB import upsertNote
+from .postcrud import create_note, get_markdown, update_noteSQL
+from .pineDB import upsertNote, updateVector
 
 app = FastAPI()
 
@@ -36,13 +36,20 @@ async def save_noteToDB(note: Note):
 
 #method to get specific note for displaying
 @app.get("/notes/{id}")
-async def get_note(id):
-    return {"message": "he"}
+async def get_note(id: str):
+    with get_db() as cursor:
+        title_markdown = get_markdown(cursor, id)
+        return {"title" : title_markdown[1],
+                "markdown" : title_markdown[0]}
+    return {"message": "ERROR NOTE NOT FOUND"}
 
 #method to update a specific note in DB
 @app.put("/notes/{id}")
-async def update_note(id):
-    return {"message": "he"}
+async def update_note(note: Note):
+    updateVector(note.id, note.title, note.markdown)
+    with get_db() as cursor:
+        update_noteSQL(cursor, note.id, note.title, note.markdown)
+    return {"message": "update note sucess"}
 
 
 
