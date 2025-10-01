@@ -83,7 +83,7 @@ def getPromptResponse(userPrompt):
 
 #testing prompt responses here:
 
-# print(getPromptResponse("I remember I had to do something important on June first what was it? ")) 
+# print(getPromptResponse("I what is my checklist for my noterious app? ")) 
 # similar = getSimilarNotes("What workout do I hit on friday?")
 # with get_db() as cursor:
 #     result = get_markdown(cursor, "e481261e-7409-49b6-a912-1dbbf18c0faf")
