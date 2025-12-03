@@ -28,4 +28,21 @@ def list_notes(cursor, limit=30):
          LIMIT %s;
     """, (limit,))
     return cursor.fetchall()
+
+def get_recent_notes(cursor, limit=10):
+    """Fetch the most recent notes by updated_at timestamp"""
+    cursor.execute("""
+        SELECT id, title, updated_at 
+        FROM notes 
+        ORDER BY updated_at DESC 
+        LIMIT %s
+    """, (limit,))
     
+    notes = []
+    for row in cursor.fetchall():
+        notes.append({
+            "id": row[0],
+            "title": row[1],
+            "updated_at": row[2].isoformat() if row[2] else None
+        })
+    return notes

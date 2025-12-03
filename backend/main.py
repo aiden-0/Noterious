@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .postgres import get_db
-from .postcrud import create_note, get_markdown, update_noteSQL
+from .postcrud import create_note, get_markdown, update_noteSQL, get_recent_notes
 from .pineDB import upsertNote, updateVector
 
 app = FastAPI()
@@ -24,6 +24,14 @@ class Note(BaseModel):
     title: str
     markdown: str
 
+#method to get 10 most recent notes
+@app.get("/notes")
+async def list_recent_notes():
+    with get_db() as cursor:
+        notes = get_recent_notes(cursor, limit=10)
+    return notes
+
+    
 #visiting the url is always a GET, so setting a route to POST, it sends a GET when visiting URL but there is no GET handler so returns "method not allowed"
 #logic for saving notes to DB here
 @app.post("/notes")
@@ -50,6 +58,9 @@ async def update_note(note: Note):
     with get_db() as cursor:
         update_noteSQL(cursor, note.id, note.title, note.markdown)
     return {"message": "update note sucess"}
+
+
+
 
 
 

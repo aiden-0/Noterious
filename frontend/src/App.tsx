@@ -8,19 +8,14 @@ import Layout from "./components/layout";
 export type NoteData = {
   title: string
   markdown: string
-  id: string 
+  id: string
 }
 
 export default function App() {
-  
-  const notes: Array<{id: string, title: string, markdown: string, createdAt: string}> = [
-    
-  ];
-
   return (
     <div style={{ height: '100vh', margin: 0, padding: 0 }}>
       <Routes>
-        <Route path="/" element={<Layout notes={notes} />}>
+        <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="new" element={<NewNote />} />
           <Route path=":id" element={<NoteShow />} />

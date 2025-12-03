@@ -6,18 +6,19 @@ import './Sidebar.css';
 interface Note {
   id: string;
   title: string;
-  markdown: string;
-  createdAt: string;
+  updated_at: string;
 }
 
 interface SidebarProps {
   notes?: Note[];
   appTitle?: string;
+  loading?: boolean;
 }
 
-const SimpleSidebar: React.FC<SidebarProps> = ({ 
-  notes = [], 
-  appTitle = 'NoteoriousAI'
+const SimpleSidebar: React.FC<SidebarProps> = ({
+  notes = [],
+  appTitle = 'NoteoriousAI',
+  loading = false
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -83,9 +84,13 @@ const SimpleSidebar: React.FC<SidebarProps> = ({
               Recent Notes
             </h6>
           </div>
-          
+
           <div className="notes-list">
-            {notes.length === 0 ? (
+            {loading ? (
+              <div className="text-center p-4 text-muted">
+                <p className="small">Loading notes...</p>
+              </div>
+            ) : notes.length === 0 ? (
               <div className="text-center p-4 text-muted">
                 <FileText size={32} className="mb-2 opacity-50" />
                 <p className="small mb-1">No notes yet</p>
@@ -95,8 +100,8 @@ const SimpleSidebar: React.FC<SidebarProps> = ({
               notes.map((note, index) => (
                 <button
                   key={note.id || index}
-                  onClick={() => handleNavigation(`/${note.id || index + 1}`)}
-                  className={`note-item ${isActive(`/${note.id || index + 1}`) ? 'active' : ''}`}
+                  onClick={() => handleNavigation(`/${note.id}`)}
+                  className={`note-item ${isActive(`/${note.id}`) ? 'active' : ''}`}
                 >
                   <div className="d-flex align-items-start">
                     <FileText size={14} className="text-muted mt-1 me-2 flex-shrink-0" />
@@ -104,15 +109,9 @@ const SimpleSidebar: React.FC<SidebarProps> = ({
                       <h6 className="note-title mb-1">
                         {note.title || 'Untitled Note'}
                       </h6>
-                      <p className="note-preview mb-1 text-muted small">
-                        {note.markdown ? 
-                          note.markdown.substring(0, 50) + (note.markdown.length > 50 ? '...' : '') 
-                          : 'No content'
-                        }
-                      </p>
                       <p className="note-date mb-0 text-muted small">
-                        {note.createdAt ? 
-                          new Date(note.createdAt).toLocaleDateString() 
+                        {note.updated_at ?
+                          new Date(note.updated_at).toLocaleDateString()
                           : 'Recently'
                         }
                       </p>
